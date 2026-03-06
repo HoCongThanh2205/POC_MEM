@@ -1,0 +1,324 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Danh sách thiết bị y tế</title>
+  <style>
+    :root{
+      --bg:#f6f8fc; --card:#fff; --line:#e3e8f2; --muted:#6b7280; --text:#111827;
+      --primary:#5b5eea; --primary-soft:#eef0ff; --danger:#dc2626; --warn:#d97706; --ok:#059669;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Arial,sans-serif}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{background:#fff;border-right:1px solid var(--line);padding:16px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+    .brand{display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fafbff}
+    .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#5b5eea,#818cf8);display:grid;place-items:center;color:#fff}
+    .brand .t1{font-weight:800}
+    .brand .t2{font-size:12px;color:var(--muted)}
+    .group{margin-top:18px}
+    .g-title{font-size:12px;font-weight:800;color:#94a3b8;margin:0 10px 8px;text-transform:uppercase;letter-spacing:.5px}
+    .item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:11px;color:#475569;text-decoration:none;font-weight:600;margin-bottom:4px}
+    .item:hover{background:#f8faff}
+    .item.active{background:linear-gradient(90deg,#6366f1,#5b5eea);color:#fff;box-shadow:0 8px 18px rgba(91,94,234,.3)}
+
+    .main{padding:16px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+    .title{font-size:24px;font-weight:800;margin:0}
+    .subtitle{font-size:13px;color:var(--muted);margin-top:3px}
+    .btn{border:1px solid #d5dceb;background:#fff;border-radius:11px;padding:9px 12px;cursor:pointer;font-weight:700}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+
+    .panel{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+    .kpi{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;text-align:left;cursor:pointer}
+    .kpi .k{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:31px;line-height:1.1;font-weight:800;margin-top:5px;color:#4f46e5}
+    .kpi.danger .v{color:var(--danger)}
+    .kpi.warn .v{color:var(--warn)}
+
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{border:1px solid #d8deec;background:#fff;border-radius:999px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700;color:#475569}
+    .chip:hover{background:#f8faff}
+
+    .filters{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:8px;margin-top:12px}
+    .input,.select{width:100%;padding:10px;border:1px solid #d5dceb;border-radius:10px;background:#fff;outline:none}
+    .input:focus,.select:focus{border-color:#9bb1df;box-shadow:0 0 0 3px rgba(91,94,234,.12)}
+
+    .bulkbar{display:none;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8faff;justify-content:space-between;align-items:center}
+
+    .table-wrap{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:#fff}
+    th,td{padding:10px;border-bottom:1px solid #edf1f8;text-align:left;vertical-align:top}
+    th{background:#f8faff;font-size:12px;color:#64748b;position:sticky;top:0;z-index:1}
+    tbody tr:hover{background:#f9fbff}
+    .asset-link{color:#4f46e5;text-decoration:none;font-weight:800}
+    .muted{font-size:12px;color:var(--muted);margin-top:3px}
+    .badge{display:inline-block;padding:4px 8px;border:1px solid #d5dceb;border-radius:999px;background:#fff;font-size:12px;font-weight:700}
+    .badge.in_use{background:#ecfdf5;border-color:#bbf7d0;color:var(--ok)}
+    .badge.standby{background:#eef2ff;border-color:#c7d2fe;color:#4338ca}
+    .badge.valid{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .badge.within_life{background:#ecfeff;border-color:#a5f3fc;color:#0f766e}
+    .badge.broken,.badge.overdue,.badge.expired{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    .badge.due_soon{background:#fffbeb;border-color:#fde68a;color:#92400e}
+
+    .pagi{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted);font-size:13px}
+    .pagi-controls{display:flex;gap:8px}
+
+    @media (max-width:1200px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.filters{grid-template-columns:1fr 1fr 1fr}}
+    @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.main{padding:12px}}
+    @media (max-width:720px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">🏥</div>
+        <div>
+          <div class="t1">Bệnh viện</div>
+          <div class="t2">Asset Management</div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="g-title">Thiết bị y tế</div>
+        <a class="item active" href="/">◻ Danh sách thiết bị</a>
+        <a class="item" href="/assets/new/">＋ Nhập mới thiết bị</a>
+      </div>
+      <div class="group">
+        <div class="g-title">Nghiệp vụ</div>
+        <a class="item" href="#">🛠 Lệnh công việc</a>
+        <a class="item" href="#">⚠ Sự cố / Báo hỏng</a>
+        <a class="item" href="#">✓ Kiểm định / Hiệu chuẩn</a>
+      </div>
+      <div class="group">
+        <div class="g-title">Kho & Danh mục</div>
+        <a class="item" href="#">📦 Kho vật tư</a>
+        <a class="item" href="#">🧩 Nhóm thiết bị</a>
+        <a class="item" href="#">🏢 Khoa/Phòng</a>
+        <a class="item" href="#">🤝 Nhà cung cấp</a>
+      </div>
+      <div class="group">
+        <div class="g-title">Tài khoản</div>
+        <a class="item" href="/logout/">⎋ Đăng xuất</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h1 class="title">Danh sách thiết bị y tế</h1>
+          <div class="subtitle">Theo dõi sử dụng, bảo trì và vòng đời trên một màn hình</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a href="/assets/new/"><button class="btn primary">+ Thêm thiết bị</button></a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="kpis" id="kpis"></div>
+        <div class="chips" id="chips"></div>
+
+        <div class="filters">
+          <input class="input" id="search" placeholder="Mã thiết bị / Tên / Serial / IMEI..." />
+          <select class="select" id="operational_status">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="in_use">Đang sử dụng</option>
+            <option value="standby">Dự phòng</option>
+            <option value="broken">Hỏng</option>
+            <option value="disabled">Disabled</option>
+          </select>
+          <select class="select" id="inspection_status">
+            <option value="all">Tất cả kiểm định</option>
+            <option value="valid">Còn hạn</option>
+            <option value="due_soon">Sắp đến hạn</option>
+            <option value="overdue">Quá hạn</option>
+            <option value="not_required">Không yêu cầu</option>
+          </select>
+          <select class="select" id="pm_status">
+            <option value="all">Tất cả PM</option>
+            <option value="valid">Còn hạn</option>
+            <option value="due_soon">Sắp đến hạn</option>
+            <option value="overdue">Quá hạn</option>
+            <option value="not_required">Không yêu cầu</option>
+          </select>
+          <button class="btn" onclick="loadAssets(1)">Lọc</button>
+        </div>
+
+        <div class="bulkbar" id="bulkBar">
+          <span>Đã chọn <b id="selectedCount">0</b> thiết bị</span>
+          <button class="btn" onclick="bulkDisable()">Disable Selected</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><input id="chkAll" type="checkbox" /></th>
+                <th>Mã thiết bị</th>
+                <th>Tên thiết bị</th>
+                <th>Khoa/Phòng - Vị trí</th>
+                <th>Trạng thái</th>
+                <th>Kiểm định</th>
+                <th>PM</th>
+                <th>EOL</th>
+                <th>Vendor/Warranty</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagi">
+          <div id="pagingText"></div>
+          <div class="pagi-controls">
+            <button class="btn" onclick="prevPage()">Prev</button>
+            <button class="btn" onclick="nextPage()">Next</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let activeKpiFilter = "";
+
+    function statusBadge(s){
+      const cls = (s || '').toLowerCase();
+      return `<span class="badge ${cls}">${s}</span>`;
+    }
+
+    function buildQuery(page){
+      const params = new URLSearchParams({page, page_size: 10});
+      const search = document.getElementById("search").value.trim();
+      if (search) params.set("search", search);
+      if (activeKpiFilter){
+        params.set("kpi_filter", activeKpiFilter);
+      } else {
+        params.set("operational_status", document.getElementById("operational_status").value);
+        params.set("inspection_status", document.getElementById("inspection_status").value);
+        params.set("pm_status", document.getElementById("pm_status").value);
+      }
+      return params.toString();
+    }
+
+    async function loadAssets(page=1){
+      const res = await fetch(`/api/assets/?${buildQuery(page)}`);
+      const data = await res.json();
+      currentPage = data.paging.page;
+      totalPages = data.paging.total_pages;
+
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = data.items.map(a => `
+        <tr>
+          <td><input class="rowChk" type="checkbox" data-id="${a.id}" onchange="updateBulk()"/></td>
+          <td><a class="asset-link" href="/assets/${a.id}/">${a.asset_code}</a><div class="muted">S/N: ${a.serial_number || '-'}</div></td>
+          <td>${a.standardized_name}<div class="muted">${a.category_group}</div></td>
+          <td>${a.department || 'Unassigned'}<div class="muted">${a.location || 'Unassigned'}</div></td>
+          <td>${statusBadge(a.operational_status)}</td>
+          <td>${statusBadge(a.inspection.status)}<div class="muted">${a.inspection.expiry_date || '-'}</div></td>
+          <td>${statusBadge(a.pm.status)}<div class="muted">${a.pm.next_due_date || '-'}</div></td>
+          <td>${statusBadge(a.eol.status)}<div class="muted">${a.eol.expiry_date || '-'}</div></td>
+          <td>${a.vendor || a.manufacturer || '-'}<div class="muted">${a.warranty_end_date || '-'}</div></td>
+          <td style="display:flex;gap:6px;flex-wrap:wrap;">
+            <a href="/assets/${a.id}/edit/"><button class="btn">Edit</button></a>
+            <button class="btn" onclick="disableOne(${a.id})">Disable</button>
+          </td>
+        </tr>
+      `).join("");
+
+      document.getElementById("pagingText").textContent = `Page ${data.paging.page}/${data.paging.total_pages} - ${data.paging.total_items} items`;
+      renderKpis(data.kpi);
+      renderChips(data.chips);
+      document.getElementById("chkAll").checked = false;
+      updateBulk();
+    }
+
+    function renderKpis(kpi){
+      const map = [
+        ["all", "Tổng thiết bị", kpi.total, ""],
+        ["in_use", "Đang sử dụng", kpi.in_use, ""],
+        ["standby", "Dự phòng", kpi.standby, ""],
+        ["broken", "Hỏng", kpi.broken, "danger"],
+        ["inspection_due_soon", "KĐ sắp đến hạn", kpi.inspection_due_soon, "warn"],
+        ["inspection_overdue", "KĐ quá hạn", kpi.inspection_overdue, "danger"]
+      ];
+      document.getElementById("kpis").innerHTML = map.map(([key,label,val,tone]) =>
+        `<button class="kpi ${tone}" onclick="applyKpi('${key}')"><div class="k">${label}</div><div class="v">${val}</div></button>`
+      ).join("");
+    }
+
+    function renderChips(chips){
+      const map = [
+        ["pm_due_soon", `PM sắp đến (${chips.pm_due_soon})`],
+        ["pm_overdue", `PM quá hạn (${chips.pm_overdue})`],
+        ["life_due_soon", `EOL sắp đến (${chips.life_due_soon})`],
+        ["life_expired", `EOL hết hạn (${chips.life_expired})`],
+        ["unassigned_department", `Thiếu khoa/phòng (${chips.unassigned_department})`],
+        ["missing_serial", `Thiếu Serial/IMEI (${chips.missing_serial})`]
+      ];
+      document.getElementById("chips").innerHTML = map.map(([key,label]) => `<button class="chip" onclick="applyKpi('${key}')">${label}</button>`).join("");
+    }
+
+    function applyKpi(key){
+      activeKpiFilter = key === "all" ? "" : key;
+      document.getElementById("operational_status").value = "all";
+      document.getElementById("inspection_status").value = "all";
+      document.getElementById("pm_status").value = "all";
+      loadAssets(1);
+    }
+
+    function updateBulk(){
+      const checks = [...document.querySelectorAll('.rowChk')];
+      const selected = checks.filter(c => c.checked).length;
+      document.getElementById("selectedCount").textContent = selected;
+      document.getElementById("bulkBar").style.display = selected > 0 ? 'flex' : 'none';
+      document.getElementById("chkAll").checked = selected > 0 && selected === checks.length;
+    }
+
+    document.getElementById("chkAll").addEventListener("change", (e) => {
+      document.querySelectorAll('.rowChk').forEach(c => c.checked = e.target.checked);
+      updateBulk();
+    });
+
+    async function disableOne(id){
+      await disableAssets([id]);
+    }
+
+    async function bulkDisable(){
+      const ids = [...document.querySelectorAll('.rowChk:checked')].map(c => Number(c.dataset.id));
+      await disableAssets(ids);
+    }
+
+    async function disableAssets(ids){
+      if (!ids.length) return;
+      const reason = prompt("Disable reason (required):", "BROKEN");
+      if (!reason) return;
+      const note = prompt("Note (optional):", "") || "";
+
+      const res = await fetch('/api/assets/disable/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ids, reason, note})
+      });
+
+      if (!res.ok){
+        const err = await res.json();
+        alert(err.error || 'Disable failed');
+        return;
+      }
+      loadAssets(currentPage);
+    }
+
+    function prevPage(){ if (currentPage > 1) loadAssets(currentPage - 1); }
+    function nextPage(){ if (currentPage < totalPages) loadAssets(currentPage + 1); }
+
+    loadAssets(1);
+  </script>
+</body>
+</html>

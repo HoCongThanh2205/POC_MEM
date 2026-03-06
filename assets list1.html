@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quản lý Thiết bị Y tế - Asset List</title>
+  <style>
+    :root{
+      --border:#e6e8ef; --border2:#eaecf0;
+      --text:#101828; --muted:#667085; --muted2:#344054;
+      --bg:#f6f8fb; --card:#fff;
+      --blue:#2563eb; --green:#12b76a; --red:#f04438; --amber:#f79009; --gray:#98a2b3;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1280px;margin:18px auto;padding:0 16px;}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 18px 8px}
+    .title{font-size:20px;font-weight:800;margin:0 0 4px}
+    .subtitle{margin:0;color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{border:1px solid #d0d5dd;background:#fff;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer}
+    .btn:hover{background:#f2f4f7}
+    .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+    .btn.primary:hover{filter:brightness(.98)}
+    .divider{height:1px;background:var(--border2)}
+    .content{padding:14px 18px 18px}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:12px}
+    .kpi{border:1px solid var(--border);border-radius:14px;padding:10px 12px;background:#fff;text-align:left;cursor:pointer}
+    .kpi:hover{box-shadow:0 1px 6px rgba(16,24,40,.06);border-color:#cfd6e6}
+    .kpi .k{font-size:12px;color:var(--muted)}
+    .kpi .v{margin-top:4px;font-size:18px;font-weight:800}
+    .kpi.warn{background:#fffaf0;border-color:#f5d6a6}
+    .kpi.danger{background:#fff5f5;border-color:#f5b5b5}
+
+    /* Chips */
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+    .chip{border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted2);cursor:pointer}
+    .chip:hover{border-color:#cfd6e6}
+    .chip.warn{background:#fffaf0;border-color:#f5d6a6}
+    .chip.danger{background:#fff5f5;border-color:#f5b5b5}
+    .chip.blue{background:#eff6ff;border-color:#bfdbfe}
+
+    /* Filters */
+    .filters{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+    .field label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
+    .input, .select{
+      width:100%;border:1px solid #d0d5dd;border-radius:12px;padding:10px 12px;background:#fff;outline:none
+    }
+    .input:focus,.select:focus{border-color:#9db5ff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+
+    /* Bulk bar */
+    .bulkbar{display:none;align-items:center;justify-content:space-between;gap:12px;
+      border:1px solid var(--border);background:#f9fafb;border-radius:14px;padding:10px 12px;margin:10px 0 12px}
+    .bulkbar .left{font-size:13px;color:var(--muted2)}
+    .btn-sm{border:1px solid #d0d5dd;background:#fff;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer}
+    .btn-sm:hover{background:#f2f4f7}
+    .btn-sm.danger{border-color:#fda29b;background:#fff5f5}
+
+    /* Table */
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:#fff;z-index:1;border-bottom:1px solid var(--border2)}
+    th,td{padding:12px 10px;text-align:left;vertical-align:top}
+    tbody tr{border-bottom:1px solid var(--border2)}
+    tbody tr + tr td{border-top:1px solid var(--border2)}
+    .muted{color:var(--muted);font-size:12px;margin-top:4px}
+    a.link{color:#1d4ed8;text-decoration:none;font-weight:800}
+    a.link:hover{text-decoration:underline}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid}
+    .dot{width:6px;height:6px;border-radius:50%}
+    .b-green{background:#ecfdf3;border-color:#abefc6}
+    .b-blue{background:#eff6ff;border-color:#bfdbfe}
+    .b-red{background:#fff5f5;border-color:#fda29b}
+    .b-gray{background:#f2f4f7;border-color:#d0d5dd}
+    .b-amber{background:#fffaf0;border-color:#f5d6a6}
+
+    .col-actions{min-width:180px}
+    .actions-row{display:flex;gap:8px;flex-wrap:wrap}
+    .row-highlight{background:#eaf3ff}
+    .small{font-size:13px;color:var(--muted2)}
+    .nowrap{white-space:nowrap}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="header">
+        <div>
+          <h1 class="title">Quản lý Thiết bị Y tế</h1>
+          <p class="subtitle">Danh sách thiết bị theo vòng đời: nhận diện · pháp lý/kiểm định · phân bổ · bảo trì · vòng đời sử dụng · thanh lý</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary">+ Thêm thiết bị</button>
+          <button class="btn">Import Excel</button>
+          <button class="btn">Xuất danh sách</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="content">
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+          <button class="kpi" data-filter="all">
+            <div class="k">Tổng thiết bị</div><div class="v" id="kpiTotal">2,431</div>
+          </button>
+          <button class="kpi" data-filter="in_use">
+            <div class="k">Đang sử dụng</div><div class="v" id="kpiInUse">1,502</div>
+          </button>
+          <button class="kpi" data-filter="standby">
+            <div class="k">Dự phòng</div><div class="v" id="kpiStandby">680</div>
+          </button>
+          <button class="kpi danger" data-filter="broken">
+            <div class="k">Hỏng</div><div class="v" id="kpiBroken">41</div>
+          </button>
+          <button class="kpi warn" data-filter="inspection_due_soon">
+            <div class="k">Sắp đến hạn kiểm định</div><div class="v" id="kpiInspectSoon">23</div>
+          </button>
+          <button class="kpi danger" data-filter="inspection_overdue">
+            <div class="k">Quá hạn kiểm định</div><div class="v" id="kpiInspectOverdue">5</div>
+          </button>
+        </div>
+
+        <!-- QUICK CHIPS -->
+        <div class="chips">
+          <button class="chip blue" data-filter="pm_due_soon">🔧 PM sắp đến (18)</button>
+          <button class="chip danger" data-filter="pm_overdue">🔧 PM quá hạn (6)</button>
+          <button class="chip warn" data-filter="life_due_soon">⏳ Sắp hết vòng đời (12)</button>
+          <button class="chip danger" data-filter="life_expired">⛔ Hết vòng đời (4)</button>
+          <button class="chip" data-filter="missing_serial">Thiếu Serial/IMEI (9)</button>
+        </div>
+
+        <!-- FILTER ROW -->
+        <div class="filters">
+          <div class="field">
+            <label>Tìm kiếm</label>
+            <input class="input" placeholder="Mã thiết bị / Tên chuẩn hóa / Serial / IMEI" />
+          </div>
+          <div class="field">
+            <label>Trạng thái hoạt động</label>
+            <select class="select">
+              <option>Tất cả</option>
+              <option>Đang sử dụng</option>
+              <option>Dự phòng</option>
+              <option>Hỏng</option>
+              <option>Disabled</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Kiểm định/Hiệu chuẩn</label>
+            <select class="select">
+              <option>Tất cả</option>
+              <option>Còn hạn</option>
+              <option>Sắp đến hạn</option>
+              <option>Quá hạn</option>
+              <option>Không yêu cầu</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Bảo trì định kỳ (PM)</label>
+            <select class="select">
+              <option>Tất cả</option>
+              <option>Còn hạn</option>
+              <option>Sắp đến hạn</option>
+              <option>Quá hạn</option>
+              <option>Không yêu cầu</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Khoa/Phòng sử dụng</label>
+            <select class="select">
+              <option>Tất cả</option>
+              <option>Khoa Cấp cứu</option>
+              <option>Khoa CĐHA</option>
+              <option>Khoa Xét nghiệm</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- BULK ACTION BAR -->
+        <div class="bulkbar" id="bulkBar">
+          <div class="left">Đã chọn <b id="bulkCount">0</b> thiết bị</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-sm">Move Khoa/Phòng</button>
+            <button class="btn-sm">Create Maintenance</button>
+            <button class="btn-sm">Export Selected</button>
+            <button class="btn-sm danger">Disable</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div style="overflow:auto;border:1px solid var(--border);border-radius:14px;background:#fff">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px"><input id="chkAll" type="checkbox"></th>
+                <th style="min-width:190px">Mã thiết bị</th>
+                <th style="min-width:240px">Tên thiết bị (chuẩn hóa)</th>
+                <th style="min-width:140px">Nhóm/Chủng loại</th>
+                <th style="min-width:160px">Khoa/Phòng</th>
+
+                <!-- NEW: Location + PIC -->
+                <th style="min-width:170px">Vị trí</th>
+                <th style="min-width:170px">PIC/Owner</th>
+
+                <th style="min-width:140px">Trạng thái</th>
+
+                <!-- NEW: Compliance / PM / Lifecycle -->
+                <th style="min-width:220px">Kiểm định/Hiệu chuẩn</th>
+                <th style="min-width:220px">Bảo trì (PM)</th>
+                <th style="min-width:220px">Vòng đời sử dụng (EOL)</th>
+
+                <!-- NEW: Vendor / Warranty -->
+                <th style="min-width:180px">Vendor / Warranty</th>
+
+                <th style="min-width:110px">Cập nhật</th>
+                <th class="col-actions">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- Row 1 -->
+              <tr class="row-highlight">
+                <td><input class="rowChk" type="checkbox"></td>
+                <td>
+                  <div><a class="link" href="#">TB-ICU-2026-00001</a></div>
+                  <div class="muted">S/N: SN12345</div>
+                </td>
+                <td>Máy theo dõi bệnh nhân đa thông số</td>
+                <td>Thiết bị chính</td>
+                <td>Khoa Cấp cứu</td>
+
+                <td class="small">Tòa A • Tầng 2 • Phòng 203</td>
+                <td class="small">Nguyễn A (Biomed)</td>
+
+                <td>
+                  <span class="badge b-green"><span class="dot" style="background:var(--green)"></span>Đang sử dụng</span>
+                </td>
+
+                <td>
+                  <span class="badge b-amber">⚠ Sắp đến hạn</span>
+                  <div class="muted">Next: 2026-02-01 (còn 28 ngày)</div>
+                </td>
+
+                <td>
+                  <span class="badge b-blue">🔧 PM sắp đến</span>
+                  <div class="muted">Next PM: 2026-01-20 (còn 16 ngày)</div>
+                </td>
+
+                <td>
+                  <span class="badge b-amber">⏳ Sắp hết vòng đời</span>
+                  <div class="muted">EOL: 2026-03-01 (còn 57 ngày)</div>
+                </td>
+
+                <td>
+                  <div class="small">GE Healthcare</div>
+                  <div class="muted">Warranty: còn 6 tháng</div>
+                </td>
+
+                <td class="nowrap">2026-01-05</td>
+                <td>
+                  <div class="actions-row">
+                    <button class="btn-sm">View</button>
+                    <button class="btn-sm">Edit</button>
+                    <button class="btn-sm danger">Disable</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 -->
+              <tr>
+                <td><input class="rowChk" type="checkbox"></td>
+                <td>
+                  <div><a class="link" href="#">TB-IMG-2025-00077</a></div>
+                  <div class="muted">IMEI: 3569…</div>
+                </td>
+                <td>Máy siêu âm Doppler màu</td>
+                <td>Thiết bị chính</td>
+                <td>Khoa CĐHA</td>
+
+                <td class="small">Tòa B • Tầng 1 • Phòng SA-02</td>
+                <td class="small">Trần B (CĐHA)</td>
+
+                <td>
+                  <span class="badge b-blue"><span class="dot" style="background:var(--blue)"></span>Dự phòng</span>
+                </td>
+
+                <td>
+                  <span class="badge b-green">✓ Còn hạn</span>
+                  <div class="muted">Next: 2026-11-01 (còn 301 ngày)</div>
+                </td>
+
+                <td>
+                  <span class="badge b-green">✓ PM còn hạn</span>
+                  <div class="muted">Next PM: 2026-06-10 (còn 157 ngày)</div>
+                </td>
+
+                <td>
+                  <span class="badge b-green">✓ Trong vòng đời</span>
+                  <div class="muted">EOL: 2027-08-15 (còn 588 ngày)</div>
+                </td>
+
+                <td>
+                  <div class="small">Philips</div>
+                  <div class="muted">Contract: còn 12 tháng</div>
+                </td>
+
+                <td class="nowrap">2026-01-03</td>
+                <td>
+                  <div class="actions-row">
+                    <button class="btn-sm">View</button>
+                    <button class="btn-sm">Edit</button>
+                    <button class="btn-sm danger">Disable</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 -->
+              <tr>
+                <td><input class="rowChk" type="checkbox"></td>
+                <td>
+                  <div><a class="link" href="#">TB-LAB-2024-00310</a></div>
+                </td>
+                <td>Máy ly tâm</td>
+                <td>Dụng cụ</td>
+                <td>Khoa Xét nghiệm</td>
+
+                <td class="small">Tòa C • Tầng 3 • Lab-05</td>
+                <td class="small">—</td>
+
+                <td>
+                  <span class="badge b-red"><span class="dot" style="background:var(--red)"></span>Hỏng</span>
+                </td>
+
+                <td>
+                  <span class="badge b-red">✖ Quá hạn</span>
+                  <div class="muted">Expired: 2025-12-01 (quá 35 ngày)</div>
+                </td>
+
+                <td>
+                  <span class="badge b-red">🔧 PM quá hạn</span>
+                  <div class="muted">Due: 2025-12-15 (quá 21 ngày)</div>
+                </td>
+
+                <td>
+                  <span class="badge b-red">⛔ Hết vòng đời</span>
+                  <div class="muted">EOL: 2025-11-30 (quá 36 ngày)</div>
+                </td>
+
+                <td>
+                  <div class="small">Eppendorf</div>
+                  <div class="muted">Warranty: hết hạn</div>
+                </td>
+
+                <td class="nowrap">2025-12-29</td>
+                <td>
+                  <div class="actions-row">
+                    <button class="btn-sm">View</button>
+                    <button class="btn-sm">Edit</button>
+                    <button class="btn-sm danger">Disable</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;color:var(--muted);font-size:13px">
+          <div>Hiển thị: 1–10 / 2,431 thiết bị</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn-sm">‹</button>
+            <button class="btn-sm" style="border-color:#9db5ff">1</button>
+            <button class="btn-sm">2</button>
+            <button class="btn-sm">3</button>
+            <button class="btn-sm">›</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Bulk bar demo logic
+    const bulkBar = document.getElementById('bulkBar');
+    const bulkCount = document.getElementById('bulkCount');
+    const chkAll = document.getElementById('chkAll');
+
+    function updateBulk(){
+      const checks = [...document.querySelectorAll('.rowChk')];
+      const selected = checks.filter(c => c.checked).length;
+      bulkCount.textContent = selected;
+      bulkBar.style.display = selected > 0 ? 'flex' : 'none';
+      chkAll.checked = selected > 0 && selected === checks.length;
+    }
+
+    document.addEventListener('change', (e) => {
+      if (e.target.classList.contains('rowChk')) updateBulk();
+      if (e.target.id === 'chkAll') {
+        document.querySelectorAll('.rowChk').forEach(c => c.checked = e.target.checked);
+        updateBulk();
+      }
+    });
+
+    // (Optional) Wire KPI/Chip click -> set filters (placeholder)
+    document.querySelectorAll('[data-filter]').forEach(el=>{
+      el.addEventListener('click', ()=> {
+        // You can implement: set dropdown values + reload list via API
+        console.log('Apply filter:', el.getAttribute('data-filter'));
+      });
+    });
+  </script>
+</body>
+</html>

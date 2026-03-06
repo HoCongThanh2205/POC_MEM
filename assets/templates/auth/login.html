@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Đăng nhập</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f5f7fc;color:#111827;display:grid;place-items:center;min-height:100vh}
+    .card{width:min(420px,94vw);background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 20px 40px rgba(15,23,42,.08)}
+    h1{margin:0 0 6px;font-size:24px}
+    .muted{margin:0 0 14px;color:#64748b;font-size:13px}
+    label{display:block;font-size:12px;color:#475569;font-weight:700;margin:8px 0 4px}
+    input{width:100%;padding:10px;border:1px solid #cfd8ea;border-radius:10px;outline:none}
+    input:focus{border-color:#8fb0e3;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+    .btn{width:100%;margin-top:12px;padding:10px;border:1px solid #5b5eea;border-radius:10px;background:#5b5eea;color:#fff;font-weight:700;cursor:pointer}
+    .msg{margin-bottom:10px;padding:8px 10px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:13px}
+    .foot{margin-top:12px;font-size:13px;color:#64748b;text-align:center}
+    a{color:#4f46e5;text-decoration:none}
+  </style>
+</head>
+<body>
+  <form class="card" method="post">
+    {% csrf_token %}
+    <h1>Đăng nhập</h1>
+    <p class="muted">Vui lòng đăng nhập để sử dụng hệ thống.</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <input type="hidden" name="next" value="{{ request.GET.next }}" />
+
+    <label>Tên đăng nhập</label>
+    <input type="text" name="username" required />
+
+    <label>Mật khẩu</label>
+    <input type="password" name="password" required />
+
+    <button class="btn" type="submit">Đăng nhập</button>
+
+    <div class="foot">Chưa có tài khoản? <a href="/register/">Đăng ký</a></div>
+  </form>
+</body>
+</html>

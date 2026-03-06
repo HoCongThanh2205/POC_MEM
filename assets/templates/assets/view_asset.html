@@ -1,0 +1,162 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>View Asset</title>
+  <style>
+    :root{--bg:#f6f8fc;--card:#fff;--line:#e3e8f2;--muted:#6b7280;--text:#111827;--primary:#5b5eea}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Arial,sans-serif}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{background:#fff;border-right:1px solid var(--line);padding:16px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+    .brand{display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fafbff}
+    .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#5b5eea,#818cf8);display:grid;place-items:center;color:#fff}
+    .t1{font-weight:800}.t2{font-size:12px;color:var(--muted)}
+    .group{margin-top:18px}.g-title{font-size:12px;font-weight:800;color:#94a3b8;margin:0 10px 8px;text-transform:uppercase}
+    .item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:11px;color:#475569;text-decoration:none;font-weight:600;margin-bottom:4px}
+    .item:hover{background:#f8faff}.item.active{background:linear-gradient(90deg,#6366f1,#5b5eea);color:#fff;box-shadow:0 8px 18px rgba(91,94,234,.3)}
+
+    .main{padding:16px}
+    .hero{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;position:sticky;top:10px;z-index:5}
+    .head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+    .head-main{min-width:0}
+    .head-actions{display:flex;gap:8px;flex-wrap:nowrap;align-items:flex-start}
+    .name{margin:0;font-size:22px;font-weight:800}.meta{font-size:13px;color:var(--muted);margin-top:4px}
+    .badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+    .badge{padding:4px 8px;border:1px solid #d5dceb;border-radius:999px;background:#fff;font-size:12px;font-weight:700}
+    .btn{border:1px solid #d5dceb;background:#fff;border-radius:10px;padding:8px 11px;cursor:pointer;font-weight:700}
+    .head-actions .btn{white-space:nowrap}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:10px}
+    .kpi{border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
+    .kpi .t{font-size:12px;color:var(--muted)}.kpi .v{margin-top:5px;font-weight:800}
+
+    .body{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--line);background:#f8faff}
+    .tab{border:1px solid #d5dceb;border-radius:999px;padding:7px 10px;cursor:pointer;background:#fff;font-size:12px;font-weight:700;color:#475569}
+    .tab.active{background:#eef0ff;border-color:#c7d2fe;color:#4338ca}
+    .pane{padding:12px}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .card{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.card h3{margin:0 0 8px;font-size:14px}
+    .line{font-size:13px;padding:4px 0;border-bottom:1px dashed #e7edf8}.line:last-child{border-bottom:none}
+
+    .table-wrap{border:1px solid var(--line);border-radius:11px;overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:#fff}
+    th,td{padding:9px 10px;border-bottom:1px solid #edf1f8;text-align:left;vertical-align:top;font-size:13px}
+    th{background:#f8faff;font-size:12px;color:#64748b;position:sticky;top:0;z-index:1}
+    tbody tr:hover{background:#f9fbff}
+    .muted{color:var(--muted)}
+
+    @media (max-width:1200px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.grid{grid-template-columns:1fr}.head{grid-template-columns:1fr}.head-actions{flex-wrap:wrap}}
+    @media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">🏥</div><div><div class="t1">Bệnh viện</div><div class="t2">Asset Management</div></div></div>
+    <div class="group"><div class="g-title">Thiết bị y tế</div><a class="item active" href="/">◻ Danh sách thiết bị</a><a class="item" href="/assets/new/">＋ Nhập mới thiết bị</a></div>
+    <div class="group"><div class="g-title">Nghiệp vụ</div><a class="item" href="#">🛠 Lệnh công việc</a><a class="item" href="#">⚠ Sự cố / Báo hỏng</a><a class="item" href="#">✓ Kiểm định / Hiệu chuẩn</a></div>
+    <div class="group"><div class="g-title">Kho & Danh mục</div><a class="item" href="#">📦 Kho vật tư</a><a class="item" href="#">🧩 Nhóm thiết bị</a><a class="item" href="#">🏢 Khoa/Phòng</a><a class="item" href="#">🤝 Nhà cung cấp</a></div>
+    <div class="group"><div class="g-title">Tài khoản</div><a class="item" href="/logout/">⎋ Đăng xuất</a></div>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="head">
+        <div class="head-main">
+          <h1 class="name" id="asset_name">Asset</h1>
+          <div class="meta" id="meta"></div>
+          <div class="badges" id="badges"></div>
+        </div>
+        <div class="head-actions">
+          <a href="/"><button class="btn">Back List</button></a>
+          <a href="/assets/{{ asset.id }}/edit/"><button class="btn">Edit</button></a>
+          <button class="btn" onclick="alert('Create Work Order')">Create WO</button>
+          <button class="btn" onclick="alert('Report Breakdown')">Report Breakdown</button>
+          <button class="btn primary" onclick="alert('Transfer / Handover')">Transfer</button>
+        </div>
+      </div>
+      <div class="kpis" id="kpi"></div>
+    </div>
+
+    <div class="body">
+      <div class="tabs" id="tabs"></div>
+      <div id="content"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const assetId = {{ asset.id }};
+  const tabDefs = [
+    ['overview','Overview'], ['timeline','Timeline'], ['pm','PM'], ['repair','Repair'],
+    ['compliance','Calibration/Inspection'], ['handover','Handover/Custody'], ['movement','Movement'],
+    ['accessories','Accessories'], ['spare_parts','Spare Parts'], ['documents','Documents'], ['audit','Audit Trail']
+  ];
+  let state = null;
+  let activeTab = 'overview';
+  function fmt(v){ return v == null || v === '' ? '-' : v; }
+
+  function renderHeader(){
+    const h = state.header;
+    document.getElementById('asset_name').textContent = `${h.asset_name} (${h.asset_code})`;
+    document.getElementById('meta').textContent = `${h.category} | ${fmt(h.model)} | ${fmt(h.manufacturer)} | Dept: ${h.department} | Location: ${h.location} | Custodian: ${h.custodian}`;
+    const badges = [`Status: ${h.status}`, `Inspection: ${h.badges.inspection.status}`, `PM: ${h.badges.pm.status}`, `EOL: ${h.badges.eol.status}`, `Warranty: ${fmt(h.badges.warranty.date)}`];
+    document.getElementById('badges').innerHTML = badges.map(x => `<span class="badge">${x}</span>`).join('');
+    const k = state.kpi;
+    document.getElementById('kpi').innerHTML = [['Breakdown 12m', k.breakdown_12m], ['Downtime 12m (min)', k.downtime_12m_minutes], ['Last PM', fmt(k.last_pm_date)], ['Next PM', fmt(k.next_pm_due)], ['Next Calibration', fmt(k.next_calibration_due)], ['Warranty Expiry', fmt(k.warranty_expiry)]].map(([t,v]) => `<div class="kpi"><div class="t">${t}</div><div class="v">${fmt(v)}</div></div>`).join('');
+  }
+
+  function renderTabs(){ document.getElementById('tabs').innerHTML = tabDefs.map(([id,label]) => `<button class="tab ${activeTab===id?'active':''}" onclick="switchTab('${id}')">${label}</button>`).join(''); }
+  function l(k,v){ return `<div class="line"><span class="muted">${k}:</span> <b>${fmt(v)}</b></div>`; }
+
+  function renderOverview(){
+    const o = state.overview, id = o.identification, ow = o.ownership, c = o.compliance_summary, lfc = o.lifecycle;
+    return `<div class="pane"><div class="grid"><div class="card"><h3>Identification</h3>${l('Asset Code',id.asset_code)}${l('Name',id.name)}${l('Type',id.asset_type)}${l('Category',id.category)}${l('Model / Manufacturer',`${fmt(id.model)} / ${fmt(id.manufacturer)}`)}${l('Serial / IMEI',`${fmt(id.serial_number)} / ${fmt(id.imei)}`)}</div><div class="card"><h3>Ownership</h3>${l('Department',ow.department)}${l('Location',ow.location)}${l('Custodian',ow.custodian)}${l('Risk Class',ow.risk_class)}</div></div><div class="grid" style="margin-top:10px"><div class="card"><h3>Compliance Summary</h3>${l('Inspection',`${fmt(c.inspection)} / ${fmt(c.inspection_due)}`)}${l('PM',`${fmt(c.pm)} / ${fmt(c.pm_due)}`)}${l('EOL',`${fmt(c.eol)} / ${fmt(c.eol_date)}`)}${l('Warranty End',c.warranty_end)}${l('Latest Compliance Result',c.latest_compliance_result)}</div><div class="card"><h3>Lifecycle</h3>${l('Commissioning Date',lfc.commissioning_date)}${l('Expected EOL',lfc.expected_eol)}${l('Status',lfc.operational_status)}${l('Notes',lfc.notes)}</div></div></div>`;
+  }
+
+  function renderTable(headers, rows){ return `<div class="pane"><div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${fmt(c)}</td>`).join('')}</tr>`).join(''):'<tr><td colspan="99" class="muted">No records</td></tr>'}</tbody></table></div></div>`; }
+  function renderTabContent(){
+    const tabs = state.tabs;
+    if (activeTab === 'overview') return renderOverview();
+    if (activeTab === 'timeline') return renderTable(['Time','Type','Reference','Summary','Actor'], state.timeline.map(e => [e.time, e.type, e.ref, e.summary, e.actor]));
+    if (activeTab === 'pm') return renderTable(['WO ID','Type/Title','Scheduled','Completed','Technician','Checklist','Status'], tabs.pm.map(x => [x.wo_code, x.title, x.scheduled_date, x.completed_date, x.technician, x.checklist_summary, x.status]));
+    if (activeTab === 'repair') return renderTable(['Incident','WO','Reported','Symptom','Priority','RCA','Downtime(min)','Status'], tabs.repair.map(x => [x.incident_code, x.wo_code, x.reported_at, x.symptom, x.priority, x.root_cause, x.downtime_minutes, x.status]));
+    if (activeTab === 'compliance') return renderTable(['Record','Type','Performed By','Date','Next Due','Result','Certificate'], tabs.compliance.map(x => [x.record_code, x.compliance_type, x.performed_by, x.performed_at, x.next_due_at, x.result, x.certificate_name]));
+    if (activeTab === 'handover') return renderTable(['Doc ID','From','To','Custodian','Date','Accessories','Signed'], tabs.handover.map(x => [x.doc_id, x.from_location, x.to_location, x.custodian_after, x.handover_date, x.accessories_summary, x.signed]));
+    if (activeTab === 'movement') return renderTable(['Date/Time','From','To','Action By','Reason'], tabs.movement.map(x => [x.moved_at, x.from_location, x.to_location, x.action_by, x.reason]));
+    if (activeTab === 'accessories') return renderTable(['Accessory','Code/Serial','Qty','Status','Mandatory','Last Verified','Notes'], tabs.accessories.map(x => [x.accessory_name, x.code_or_serial, x.quantity, x.status, x.mandatory, x.last_verified_date, x.notes]));
+    if (activeTab === 'spare_parts') return renderTable(['Date','WO','Part Code','Part Name','Qty','Batch','Store','Cost'], tabs.spare_parts.map(x => [x.consumed_at, x.wo_code, x.part_code, x.part_name, x.quantity, x.batch_info, x.issued_store, x.cost]));
+    if (activeTab === 'documents') return renderTable(['Type','File Name','Related','Updated At'], tabs.documents.map(x => [x.doc_type, x.file_name, x.related_to, x.updated_at]));
+    if (activeTab === 'audit') return renderTable(['Time','User','Action','Field','Before','After'], tabs.audit.map(x => [x.acted_at, x.actor, x.action, x.field_name, x.before_value, x.after_value]));
+    return '';
+  }
+
+  function switchTab(id){ activeTab = id; renderTabs(); document.getElementById('content').innerHTML = renderTabContent(); }
+  async function loadDetail(){
+    try {
+      const res = await fetch(`/api/assets/${assetId}/`);
+      if (!res.ok) {
+        throw new Error(`API ${res.status}`);
+      }
+      state = await res.json();
+      renderHeader();
+      switchTab(activeTab);
+    } catch (err) {
+      document.getElementById('asset_name').textContent = 'Không tải được chi tiết thiết bị';
+      document.getElementById('meta').textContent = 'Vui lòng kiểm tra dữ liệu thiết bị hoặc log server.';
+      document.getElementById('badges').innerHTML = '<span class="badge">Lỗi tải dữ liệu</span>';
+      document.getElementById('kpi').innerHTML = '';
+      document.getElementById('tabs').innerHTML = '';
+      document.getElementById('content').innerHTML = `<div class="pane"><div class="card"><h3>Lỗi</h3><div class="line">Chi tiết: ${fmt(err && err.message ? err.message : 'Unknown error')}</div></div></div>`;
+    }
+  }
+  loadDetail();
+</script>
+</body>
+</html>
